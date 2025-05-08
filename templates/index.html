@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图表生成器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="app-title">图表生成器</h1>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>输入数据</h2>
+                <div class="form-group">
+                    <label for="chart-title">图表标题</label>
+                    <input type="text" id="chart-title" placeholder="请输入图表标题">
+                </div>
+
+                <div id="data-entries">
+                    <div class="data-entry">
+                        <input type="text" class="item-name" placeholder="项目名称">
+                        <input type="number" class="item-value" placeholder="数值">
+                        <input type="text" class="item-unit" placeholder="单位 (如 %)">
+                        <button class="remove-entry">删除</button>
+                    </div>
+                </div>
+
+                <button id="add-entry">添加数据项</button>
+
+                <div class="chart-type">
+                    <h3>选择图表类型</h3>
+                    <div class="chart-options">
+                        <button class="chart-option" data-type="pie">饼状图</button>
+                        <button class="chart-option" data-type="bar">柱状图</button>
+                        <button class="chart-option" data-type="line">折线图</button>
+                    </div>
+                </div>
+
+                <button id="generate-chart">生成图表</button>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-container">
+                    <canvas id="chart-canvas"></canvas>
+                </div>
+
+                <div class="chart-controls" style="display: none;">
+                    <h3>图表设置</h3>
+                    <button id="color-toggle">使用彩色系</button>
+                    <button id="toggle-data-labels">隐藏数据项</button>
+                    <div class="form-group">
+                        <label for="font-color">字体颜色</label>
+                        <input type="color" id="font-color" value="#000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="title-font-size">标题字体大小</label>
+                        <input type="range" id="title-font-size" min="12" max="32" value="18">
+                        <span id="title-font-size-value">18px</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="item-font-size">项目字体大小</label>
+                        <input type="range" id="item-font-size" min="8" max="20" value="12">
+                        <span id="item-font-size-value">12px</span>
+                    </div>
+                    <button id="apply-changes">应用改动</button>
+                    <button id="export-chart">导出为图片</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>技术支持：PieGet 图表生成器 | 版权所有 © 2023</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
