@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', function () {
     // 注册Chart.js数据标签插件
-    Chart.register(ChartDataLabels);
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js 未正确加载');
+        return;
+    }
+    
+    // 确保ChartDataLabels插件存在
+    if (typeof ChartDataLabels === 'undefined') {
+        console.error('Chart.js DataLabels 插件未正确加载');
+        return;
+    }
+
+    // 注册插件
+    try {
+        Chart.register(ChartDataLabels);
+    } catch (error) {
+        console.error('注册Chart.js插件失败:', error);
+        return;
+    }
 
     // 全局变量
     let chartInstance = null;
@@ -17,15 +34,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const chartControls = document.querySelector('.chart-controls');
     const exportChartBtn = document.getElementById('export-chart');
     const fontColorInput = document.getElementById('font-color');
-    const fontSizeInput = document.getElementById('font-size');
-    const fontSizeValue = document.getElementById('font-size-value');
+    const titleFontSizeInput = document.getElementById('title-font-size');
+    const titleFontSizeValue = document.getElementById('title-font-size-value');
+    const itemFontSizeInput = document.getElementById('item-font-size');
+    const itemFontSizeValue = document.getElementById('item-font-size-value');
     const chartOptions = document.querySelectorAll('.chart-option');
     const toggleDataLabelsBtn = document.getElementById('toggle-data-labels');
     const applyChangesBtn = document.getElementById('apply-changes');
+    const colorToggleBtn = document.getElementById('color-toggle');
+
+    // 检查必要的DOM元素是否存在
+    if (!addEntryBtn || !dataEntriesContainer || !generateChartBtn || !chartCanvas) {
+        console.error('必要的DOM元素未找到');
+        return;
+    }
 
     // 初始化 - 确保至少有一个数据项
     if (dataEntriesContainer.children.length === 0) {
         addDataEntry();
+    }
+
+    // 显示图表控制面板
+    function showChartControls() {
+        if (chartControls) {
+            chartControls.style.display = 'block';
+        }
     }
 
     // 添加数据项
@@ -58,61 +91,72 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 默认选中饼图
-    document.querySelector('.chart-option[data-type="pie"]').classList.add('active');
+    const defaultChartOption = document.querySelector('.chart-option[data-type="pie"]');
+    if (defaultChartOption) {
+        defaultChartOption.classList.add('active');
+    }
 
     // 生成图表
     generateChartBtn.addEventListener('click', generateChart);
 
-    // 字体颜色变更 - 改为实时预览
-    fontColorInput.addEventListener('input', updateChartStyles);
+    // 字体颜色变更
+    if (fontColorInput) {
+        fontColorInput.addEventListener('input', updateChartStyles);
+    }
 
     // 标题字体大小变更
-    const titleFontSizeInput = document.getElementById('title-font-size');
-    const titleFontSizeValue = document.getElementById('title-font-size-value');
-    titleFontSizeInput.addEventListener('input', function () {
-        titleFontSizeValue.textContent = this.value + 'px';
-        updateChartStyles();
-    });
+    if (titleFontSizeInput && titleFontSizeValue) {
+        titleFontSizeInput.addEventListener('input', function () {
+            titleFontSizeValue.textContent = this.value + 'px';
+            updateChartStyles();
+        });
+    }
 
     // 项目字体大小变更
-    const itemFontSizeInput = document.getElementById('item-font-size');
-    const itemFontSizeValue = document.getElementById('item-font-size-value');
-    itemFontSizeInput.addEventListener('input', function () {
-        itemFontSizeValue.textContent = this.value + 'px';
-        updateChartStyles();
-    });
+    if (itemFontSizeInput && itemFontSizeValue) {
+        itemFontSizeInput.addEventListener('input', function () {
+            itemFontSizeValue.textContent = this.value + 'px';
+            updateChartStyles();
+        });
+    }
 
     // 配色切换
-    const colorToggleBtn = document.getElementById('color-toggle');
-    colorToggleBtn.addEventListener('click', function () {
-        useColorful = !useColorful;
-        this.textContent = useColorful ? '使用蓝色系' : '使用彩色系';
-        if (chartInstance) {
-            generateChart();
-        }
-    });
+    if (colorToggleBtn) {
+        colorToggleBtn.addEventListener('click', function () {
+            useColorful = !useColorful;
+            this.textContent = useColorful ? '使用蓝色系' : '使用彩色系';
+            if (chartInstance) {
+                generateChart();
+            }
+        });
+    }
 
     // 数据标签显示切换
-    toggleDataLabelsBtn.addEventListener('click', function () {
-        showDataLabels = !showDataLabels;
-        this.textContent = showDataLabels ? '隐藏数据项' : '显示数据项';
-        if (chartInstance) {
-            chartInstance.options.plugins.datalabels.display = showDataLabels;
-            chartInstance.update();
-        }
-    });
+    if (toggleDataLabelsBtn) {
+        toggleDataLabelsBtn.addEventListener('click', function () {
+            showDataLabels = !showDataLabels;
+            this.textContent = showDataLabels ? '隐藏数据项' : '显示数据项';
+            if (chartInstance) {
+                chartInstance.options.plugins.datalabels.display = showDataLabels;
+                chartInstance.update();
+            }
+        });
+    }
 
     // 应用样式改动
-    applyChangesBtn.addEventListener('click', function () {
-        if (chartInstance) {
-            updateChartStyles();
-            // 重新生成图表以应用所有更改
-            generateChart();
-        }
-    });
+    if (applyChangesBtn) {
+        applyChangesBtn.addEventListener('click', function () {
+            if (chartInstance) {
+                updateChartStyles();
+                generateChart();
+            }
+        });
+    }
 
     // 导出图表为图片
-    exportChartBtn.addEventListener('click', exportChart);
+    if (exportChartBtn) {
+        exportChartBtn.addEventListener('click', exportChart);
+    }
 
     // 添加数据项函数
     function addDataEntry() {
@@ -271,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chartInstance = new Chart(ctx, config);
 
         // 显示图表控制区域
-        chartControls.style.display = 'block';
+        showChartControls();
     }
 
     // 更新图表样式

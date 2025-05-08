@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 @app.route('/')
 def index():
@@ -14,5 +14,4 @@ def generate_chart():
     return jsonify(data)
 
 if __name__ == '__main__':
-    # app.run(host="0.0.0.0", port=8030, debug=True)
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", port=8061, debug=True)
